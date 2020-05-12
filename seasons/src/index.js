@@ -1,32 +1,32 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-
-// const App = () => {
-//   return <div>Опять, привет сосед!</div>
-// }
+import SeasonDisplay from './SeasonDisplay'
+import Spinner from './Spinner'
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
+  state = { lat: null, errorMessage: '' }
 
-    this.state = { lat: null, errorMessage: '' }
-
+  componentDidMount() {
     window.navigator.geolocation.getCurrentPosition(
-      position => {
-        this.setState({ lat: position.coords.latitude })
-      },
-      err => {
-        this.setState({ errorMessage: err.message })
-      }
+      position => this.setState({ lat: position.coords.latitude }),
+      err => this.setState({ errorMessage: err.message })
     )
   }
+
+  renderContent() {
+    if (this.state.errorMessage && !this.state.lat) {
+      return <div>Error: {this.state.errorMessage}</div>
+    }
+
+    if (!this.state.errorMessage && this.state.lat) {
+      return <SeasonDisplay lat={this.state.lat} />
+    }
+
+    return <Spinner message="Пожалуйста приймите запрос местоположения" />
+  }
+
   render() {
-    return (
-      <div>
-        Широта: {this.state.lat}
-        <p>Error: {this.state.errorMessage}</p>
-      </div>
-    )
+    return <div className="border-red">{this.renderContent()}</div>
   }
 }
 
